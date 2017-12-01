@@ -1,0 +1,1121 @@
+{
+    "header_types": [
+        {
+            "name": "standard_metadata_t",
+            "id": 0,
+            "fields": [
+                [
+                    "ingress_port",
+                    9
+                ],
+                [
+                    "packet_length",
+                    32
+                ],
+                [
+                    "egress_spec",
+                    9
+                ],
+                [
+                    "egress_port",
+                    9
+                ],
+                [
+                    "egress_instance",
+                    32
+                ],
+                [
+                    "instance_type",
+                    32
+                ],
+                [
+                    "clone_spec",
+                    32
+                ],
+                [
+                    "_padding",
+                    5
+                ]
+            ],
+            "length_exp": null,
+            "max_length": null
+        },
+        {
+            "name": "ethernet_t",
+            "id": 1,
+            "fields": [
+                [
+                    "dstAddr",
+                    48
+                ],
+                [
+                    "srcAddr",
+                    48
+                ],
+                [
+                    "etherType",
+                    16
+                ]
+            ],
+            "length_exp": null,
+            "max_length": null
+        },
+        {
+            "name": "ipv4_t",
+            "id": 2,
+            "fields": [
+                [
+                    "version",
+                    4
+                ],
+                [
+                    "ihl",
+                    4
+                ],
+                [
+                    "diffserv",
+                    8
+                ],
+                [
+                    "totalLen",
+                    16
+                ],
+                [
+                    "identification",
+                    16
+                ],
+                [
+                    "flags",
+                    3
+                ],
+                [
+                    "fragOffset",
+                    13
+                ],
+                [
+                    "ttl",
+                    8
+                ],
+                [
+                    "protocol",
+                    8
+                ],
+                [
+                    "hdrChecksum",
+                    16
+                ],
+                [
+                    "srcAddr",
+                    32
+                ],
+                [
+                    "dstAddr",
+                    32
+                ]
+            ],
+            "length_exp": null,
+            "max_length": null
+        },
+        {
+            "name": "get_t",
+            "id": 3,
+            "fields": [
+                [
+                    "version_type",
+                    8
+                ],
+                [
+                    "ttl",
+                    8
+                ],
+                [
+                    "total_len",
+                    16
+                ],
+                [
+                    "port_no1",
+                    16
+                ],
+                [
+                    "port_no2",
+                    16
+                ],
+                [
+                    "minpid",
+                    16
+                ],
+                [
+                    "pids_o",
+                    8
+                ],
+                [
+                    "res",
+                    8
+                ],
+                [
+                    "mtu",
+                    16
+                ],
+                [
+                    "checksum",
+                    16
+                ],
+                [
+                    "sid",
+                    288
+                ],
+                [
+                    "nid_c",
+                    128
+                ],
+                [
+                    "mac",
+                    32
+                ],
+                [
+                    "offset",
+                    32
+                ],
+                [
+                    "len",
+                    32
+                ],
+                [
+                    "pid1",
+                    32
+                ]
+            ],
+            "length_exp": null,
+            "max_length": null
+        },
+        {
+            "name": "data_t",
+            "id": 4,
+            "fields": [
+                [
+                    "version_type",
+                    8
+                ],
+                [
+                    "ttl",
+                    8
+                ],
+                [
+                    "total_len",
+                    16
+                ],
+                [
+                    "port_no1",
+                    16
+                ],
+                [
+                    "port_no2",
+                    16
+                ],
+                [
+                    "minpid",
+                    16
+                ],
+                [
+                    "pids_o",
+                    8
+                ],
+                [
+                    "res",
+                    8
+                ],
+                [
+                    "pid_index",
+                    8
+                ],
+                [
+                    "reserved",
+                    8
+                ],
+                [
+                    "checksum",
+                    16
+                ],
+                [
+                    "sid",
+                    288
+                ],
+                [
+                    "nid_c",
+                    120
+                ],
+                [
+                    "nid_c_pad",
+                    8
+                ],
+                [
+                    "mac",
+                    32
+                ],
+                [
+                    "offset",
+                    32
+                ],
+                [
+                    "len",
+                    32
+                ],
+                [
+                    "pid1",
+                    32
+                ]
+            ],
+            "length_exp": null,
+            "max_length": null
+        }
+    ],
+    "headers": [
+        {
+            "name": "standard_metadata",
+            "id": 0,
+            "header_type": "standard_metadata_t",
+            "metadata": true
+        },
+        {
+            "name": "ethernet",
+            "id": 1,
+            "header_type": "ethernet_t",
+            "metadata": false
+        },
+        {
+            "name": "ipv4",
+            "id": 2,
+            "header_type": "ipv4_t",
+            "metadata": false
+        },
+        {
+            "name": "get",
+            "id": 3,
+            "header_type": "get_t",
+            "metadata": false
+        },
+        {
+            "name": "data",
+            "id": 4,
+            "header_type": "data_t",
+            "metadata": false
+        }
+    ],
+    "header_stacks": [],
+    "parsers": [
+        {
+            "name": "parser",
+            "id": 0,
+            "init_state": "start",
+            "parse_states": [
+                {
+                    "name": "start",
+                    "id": 0,
+                    "parser_ops": [],
+                    "transition_key": [],
+                    "transitions": [
+                        {
+                            "value": "default",
+                            "mask": null,
+                            "next_state": "parse_ethernet"
+                        }
+                    ]
+                },
+                {
+                    "name": "parse_ethernet",
+                    "id": 1,
+                    "parser_ops": [
+                        {
+                            "op": "extract",
+                            "parameters": [
+                                {
+                                    "type": "regular",
+                                    "value": "ethernet"
+                                }
+                            ]
+                        }
+                    ],
+                    "transition_key": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "ethernet",
+                                "etherType"
+                            ]
+                        }
+                    ],
+                    "transitions": [
+                        {
+                            "value": "0x0800",
+                            "mask": null,
+                            "next_state": "parse_ipv4"
+                        },
+                        {
+                            "value": "default",
+                            "mask": null,
+                            "next_state": null
+                        }
+                    ]
+                },
+                {
+                    "name": "parse_ipv4",
+                    "id": 2,
+                    "parser_ops": [
+                        {
+                            "op": "extract",
+                            "parameters": [
+                                {
+                                    "type": "regular",
+                                    "value": "ipv4"
+                                }
+                            ]
+                        }
+                    ],
+                    "transition_key": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "ipv4",
+                                "protocol"
+                            ]
+                        }
+                    ],
+                    "transitions": [
+                        {
+                            "value": "0xa0",
+                            "mask": null,
+                            "next_state": "parse_get"
+                        },
+                        {
+                            "value": "0xa1",
+                            "mask": null,
+                            "next_state": "parse_data"
+                        },
+                        {
+                            "value": "default",
+                            "mask": null,
+                            "next_state": null
+                        }
+                    ]
+                },
+                {
+                    "name": "parse_get",
+                    "id": 3,
+                    "parser_ops": [
+                        {
+                            "op": "extract",
+                            "parameters": [
+                                {
+                                    "type": "regular",
+                                    "value": "get"
+                                }
+                            ]
+                        }
+                    ],
+                    "transition_key": [],
+                    "transitions": [
+                        {
+                            "value": "default",
+                            "mask": null,
+                            "next_state": null
+                        }
+                    ]
+                },
+                {
+                    "name": "parse_data",
+                    "id": 4,
+                    "parser_ops": [
+                        {
+                            "op": "extract",
+                            "parameters": [
+                                {
+                                    "type": "regular",
+                                    "value": "data"
+                                }
+                            ]
+                        }
+                    ],
+                    "transition_key": [],
+                    "transitions": [
+                        {
+                            "value": "default",
+                            "mask": null,
+                            "next_state": null
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "deparsers": [
+        {
+            "name": "deparser",
+            "id": 0,
+            "order": [
+                "ethernet",
+                "ipv4",
+                "data",
+                "get"
+            ]
+        }
+    ],
+    "meter_arrays": [],
+    "actions": [
+        {
+            "name": "set_egress_port",
+            "id": 0,
+            "runtime_data": [
+                {
+                    "name": "port",
+                    "bitwidth": 9
+                }
+            ],
+            "primitives": [
+                {
+                    "op": "modify_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "standard_metadata",
+                                "egress_spec"
+                            ]
+                        },
+                        {
+                            "type": "runtime_data",
+                            "value": 0
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "_drop",
+            "id": 1,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "drop",
+                    "parameters": []
+                }
+            ]
+        },
+        {
+            "name": "set_ip",
+            "id": 2,
+            "runtime_data": [
+                {
+                    "name": "ip",
+                    "bitwidth": 32
+                }
+            ],
+            "primitives": [
+                {
+                    "op": "modify_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "ipv4",
+                                "dstAddr"
+                            ]
+                        },
+                        {
+                            "type": "runtime_data",
+                            "value": 0
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "set_pids_o",
+            "id": 3,
+            "runtime_data": [],
+            "primitives": [
+                {
+                    "op": "add_to_field",
+                    "parameters": [
+                        {
+                            "type": "field",
+                            "value": [
+                                "data",
+                                "pids_o"
+                            ]
+                        },
+                        {
+                            "type": "hexstr",
+                            "value": "-0x1"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "pipelines": [
+        {
+            "name": "ingress",
+            "id": 0,
+            "init_table": "_condition_0",
+            "tables": [
+                {
+                    "name": "get_inter_pid_ip",
+                    "id": 0,
+                    "match_type": "exact",
+                    "type": "simple",
+                    "max_size": 1024,
+                    "with_counters": false,
+                    "direct_meters": null,
+                    "support_timeout": false,
+                    "key": [
+                        {
+                            "match_type": "exact",
+                            "target": [
+                                "get",
+                                "pid1"
+                            ],
+                            "mask": null
+                        }
+                    ],
+                    "actions": [
+                        "set_ip",
+                        "_drop"
+                    ],
+                    "next_tables": {
+                        "set_ip": "_condition_7",
+                        "_drop": "_condition_7"
+                    },
+                    "default_action": null,
+                    "base_default_next": "_condition_7"
+                },
+                {
+                    "name": "get_to_rm",
+                    "id": 1,
+                    "match_type": "exact",
+                    "type": "simple",
+                    "max_size": 1024,
+                    "with_counters": false,
+                    "direct_meters": null,
+                    "support_timeout": false,
+                    "key": [
+                        {
+                            "match_type": "exact",
+                            "target": [
+                                "get",
+                                "version_type"
+                            ],
+                            "mask": null
+                        }
+                    ],
+                    "actions": [
+                        "set_ip",
+                        "_drop"
+                    ],
+                    "next_tables": {
+                        "set_ip": "_condition_7",
+                        "_drop": "_condition_7"
+                    },
+                    "default_action": null,
+                    "base_default_next": "_condition_7"
+                },
+                {
+                    "name": "data_inter_pid_ip",
+                    "id": 2,
+                    "match_type": "exact",
+                    "type": "simple",
+                    "max_size": 1024,
+                    "with_counters": false,
+                    "direct_meters": null,
+                    "support_timeout": false,
+                    "key": [
+                        {
+                            "match_type": "exact",
+                            "target": [
+                                "data",
+                                "pid1"
+                            ],
+                            "mask": null
+                        }
+                    ],
+                    "actions": [
+                        "set_ip",
+                        "_drop"
+                    ],
+                    "next_tables": {
+                        "set_ip": "_condition_7",
+                        "_drop": "_condition_7"
+                    },
+                    "default_action": null,
+                    "base_default_next": "_condition_7"
+                },
+                {
+                    "name": "data_nid_c_ip",
+                    "id": 3,
+                    "match_type": "exact",
+                    "type": "simple",
+                    "max_size": 1024,
+                    "with_counters": false,
+                    "direct_meters": null,
+                    "support_timeout": false,
+                    "key": [
+                        {
+                            "match_type": "exact",
+                            "target": [
+                                "data",
+                                "nid_c"
+                            ],
+                            "mask": null
+                        }
+                    ],
+                    "actions": [
+                        "set_ip",
+                        "_drop"
+                    ],
+                    "next_tables": {
+                        "set_ip": "_condition_7",
+                        "_drop": "_condition_7"
+                    },
+                    "default_action": null,
+                    "base_default_next": "_condition_7"
+                },
+                {
+                    "name": "data_intra_pid_ip",
+                    "id": 4,
+                    "match_type": "exact",
+                    "type": "simple",
+                    "max_size": 1024,
+                    "with_counters": false,
+                    "direct_meters": null,
+                    "support_timeout": false,
+                    "key": [
+                        {
+                            "match_type": "exact",
+                            "target": [
+                                "data",
+                                "pid1"
+                            ],
+                            "mask": null
+                        }
+                    ],
+                    "actions": [
+                        "set_ip",
+                        "_drop"
+                    ],
+                    "next_tables": {
+                        "set_ip": "_condition_7",
+                        "_drop": "_condition_7"
+                    },
+                    "default_action": null,
+                    "base_default_next": "_condition_7"
+                },
+                {
+                    "name": "data_pids_o_subtract",
+                    "id": 5,
+                    "match_type": "exact",
+                    "type": "simple",
+                    "max_size": 1024,
+                    "with_counters": false,
+                    "direct_meters": null,
+                    "support_timeout": false,
+                    "key": [
+                        {
+                            "match_type": "exact",
+                            "target": [
+                                "data",
+                                "version_type"
+                            ],
+                            "mask": null
+                        }
+                    ],
+                    "actions": [
+                        "set_pids_o",
+                        "_drop"
+                    ],
+                    "next_tables": {
+                        "set_pids_o": "_condition_5",
+                        "_drop": "_condition_5"
+                    },
+                    "default_action": null,
+                    "base_default_next": "_condition_5"
+                },
+                {
+                    "name": "ip_port",
+                    "id": 6,
+                    "match_type": "lpm",
+                    "type": "simple",
+                    "max_size": 1024,
+                    "with_counters": false,
+                    "direct_meters": null,
+                    "support_timeout": false,
+                    "key": [
+                        {
+                            "match_type": "lpm",
+                            "target": [
+                                "ipv4",
+                                "dstAddr"
+                            ],
+                            "mask": null
+                        }
+                    ],
+                    "actions": [
+                        "set_egress_port",
+                        "_drop"
+                    ],
+                    "next_tables": {
+                        "set_egress_port": null,
+                        "_drop": null
+                    },
+                    "default_action": null,
+                    "base_default_next": null
+                }
+            ],
+            "conditionals": [
+                {
+                    "name": "_condition_0",
+                    "id": 0,
+                    "expression": {
+                        "type": "expression",
+                        "value": {
+                            "op": "==",
+                            "left": {
+                                "type": "field",
+                                "value": [
+                                    "ipv4",
+                                    "protocol"
+                                ]
+                            },
+                            "right": {
+                                "type": "hexstr",
+                                "value": "0xa0"
+                            }
+                        }
+                    },
+                    "true_next": "_condition_1",
+                    "false_next": "_condition_3"
+                },
+                {
+                    "name": "_condition_1",
+                    "id": 1,
+                    "expression": {
+                        "type": "expression",
+                        "value": {
+                            "op": "==",
+                            "left": {
+                                "type": "field",
+                                "value": [
+                                    "standard_metadata",
+                                    "ingress_port"
+                                ]
+                            },
+                            "right": {
+                                "type": "hexstr",
+                                "value": "0x1"
+                            }
+                        }
+                    },
+                    "true_next": "get_inter_pid_ip",
+                    "false_next": "_condition_2"
+                },
+                {
+                    "name": "_condition_2",
+                    "id": 2,
+                    "expression": {
+                        "type": "expression",
+                        "value": {
+                            "op": "==",
+                            "left": {
+                                "type": "field",
+                                "value": [
+                                    "standard_metadata",
+                                    "ingress_port"
+                                ]
+                            },
+                            "right": {
+                                "type": "hexstr",
+                                "value": "0x2"
+                            }
+                        }
+                    },
+                    "true_next": "get_to_rm",
+                    "false_next": "_condition_7"
+                },
+                {
+                    "name": "_condition_3",
+                    "id": 3,
+                    "expression": {
+                        "type": "expression",
+                        "value": {
+                            "op": "==",
+                            "left": {
+                                "type": "field",
+                                "value": [
+                                    "ipv4",
+                                    "protocol"
+                                ]
+                            },
+                            "right": {
+                                "type": "hexstr",
+                                "value": "0xa1"
+                            }
+                        }
+                    },
+                    "true_next": "_condition_4",
+                    "false_next": "_condition_7"
+                },
+                {
+                    "name": "_condition_4",
+                    "id": 4,
+                    "expression": {
+                        "type": "expression",
+                        "value": {
+                            "op": "==",
+                            "left": {
+                                "type": "field",
+                                "value": [
+                                    "standard_metadata",
+                                    "ingress_port"
+                                ]
+                            },
+                            "right": {
+                                "type": "hexstr",
+                                "value": "0x2"
+                            }
+                        }
+                    },
+                    "true_next": "data_pids_o_subtract",
+                    "false_next": "data_inter_pid_ip"
+                },
+                {
+                    "name": "_condition_5",
+                    "id": 5,
+                    "expression": {
+                        "type": "expression",
+                        "value": {
+                            "op": "==",
+                            "left": {
+                                "type": "field",
+                                "value": [
+                                    "data",
+                                    "pids_o"
+                                ]
+                            },
+                            "right": {
+                                "type": "hexstr",
+                                "value": "0x0"
+                            }
+                        }
+                    },
+                    "true_next": "data_nid_c_ip",
+                    "false_next": "_condition_6"
+                },
+                {
+                    "name": "_condition_6",
+                    "id": 6,
+                    "expression": {
+                        "type": "expression",
+                        "value": {
+                            "op": "==",
+                            "left": {
+                                "type": "field",
+                                "value": [
+                                    "data",
+                                    "pids_o"
+                                ]
+                            },
+                            "right": {
+                                "type": "hexstr",
+                                "value": "0x1"
+                            }
+                        }
+                    },
+                    "true_next": "data_intra_pid_ip",
+                    "false_next": "_condition_7"
+                },
+                {
+                    "name": "_condition_7",
+                    "id": 7,
+                    "expression": {
+                        "type": "expression",
+                        "value": {
+                            "op": "and",
+                            "left": {
+                                "type": "expression",
+                                "value": {
+                                    "op": "valid",
+                                    "left": null,
+                                    "right": {
+                                        "type": "header",
+                                        "value": "ipv4"
+                                    }
+                                }
+                            },
+                            "right": {
+                                "type": "expression",
+                                "value": {
+                                    "op": ">",
+                                    "left": {
+                                        "type": "field",
+                                        "value": [
+                                            "ipv4",
+                                            "ttl"
+                                        ]
+                                    },
+                                    "right": {
+                                        "type": "hexstr",
+                                        "value": "0x0"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "true_next": "ip_port",
+                    "false_next": null
+                }
+            ]
+        },
+        {
+            "name": "egress",
+            "id": 1,
+            "init_table": null,
+            "tables": [],
+            "conditionals": []
+        }
+    ],
+    "calculations": [
+        {
+            "name": "ipv4_checksum",
+            "id": 0,
+            "input": [
+                {
+                    "type": "field",
+                    "value": [
+                        "ipv4",
+                        "version"
+                    ]
+                },
+                {
+                    "type": "field",
+                    "value": [
+                        "ipv4",
+                        "ihl"
+                    ]
+                },
+                {
+                    "type": "field",
+                    "value": [
+                        "ipv4",
+                        "diffserv"
+                    ]
+                },
+                {
+                    "type": "field",
+                    "value": [
+                        "ipv4",
+                        "totalLen"
+                    ]
+                },
+                {
+                    "type": "field",
+                    "value": [
+                        "ipv4",
+                        "identification"
+                    ]
+                },
+                {
+                    "type": "field",
+                    "value": [
+                        "ipv4",
+                        "flags"
+                    ]
+                },
+                {
+                    "type": "field",
+                    "value": [
+                        "ipv4",
+                        "fragOffset"
+                    ]
+                },
+                {
+                    "type": "field",
+                    "value": [
+                        "ipv4",
+                        "ttl"
+                    ]
+                },
+                {
+                    "type": "field",
+                    "value": [
+                        "ipv4",
+                        "protocol"
+                    ]
+                },
+                {
+                    "type": "field",
+                    "value": [
+                        "ipv4",
+                        "srcAddr"
+                    ]
+                },
+                {
+                    "type": "field",
+                    "value": [
+                        "ipv4",
+                        "dstAddr"
+                    ]
+                }
+            ],
+            "algo": "csum16"
+        }
+    ],
+    "checksums": [
+        {
+            "name": "ipv4.hdrChecksum|ipv4_checksum",
+            "id": 0,
+            "target": [
+                "ipv4",
+                "hdrChecksum"
+            ],
+            "type": "generic",
+            "calculation": "ipv4_checksum",
+            "if_cond": null
+        }
+    ],
+    "learn_lists": [],
+    "field_lists": [],
+    "counter_arrays": [],
+    "register_arrays": [],
+    "force_arith": [
+        [
+            "standard_metadata",
+            "ingress_port"
+        ],
+        [
+            "standard_metadata",
+            "packet_length"
+        ],
+        [
+            "standard_metadata",
+            "egress_spec"
+        ],
+        [
+            "standard_metadata",
+            "egress_port"
+        ],
+        [
+            "standard_metadata",
+            "egress_instance"
+        ],
+        [
+            "standard_metadata",
+            "instance_type"
+        ],
+        [
+            "standard_metadata",
+            "clone_spec"
+        ],
+        [
+            "standard_metadata",
+            "_padding"
+        ]
+    ]
+}

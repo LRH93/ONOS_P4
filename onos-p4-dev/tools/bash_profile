@@ -1,0 +1,173 @@
+#!/bin/bash
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+export P4_PATH="$( readlink -f "${DIR}/.." )"
+export BMV2_PATH=$P4_PATH/onos-bmv2
+export BMV2_EXE=$BMV2_PATH/targets/simple_switch/simple_switch
+export BMV2_JSON=$P4_PATH/p4src/build/empty.json
+export BMV2_PY=$P4_PATH/mininet/bmv2.py
+
+export P4C_BM_PATH=$P4_PATH/p4c-bmv2
+export P4SRC_PATH=$P4_PATH/p4src
+
+p4c () {
+    if [ -z "$1" ]; then
+        echo "No argument supplied. Usage: p4c P4_PROGRAM_NAME"
+        return
+    fi
+
+    mkdir -p $P4SRC_PATH/build
+
+    P4SRC="$P4SRC_PATH/$1.p4"
+    P4JSON="$P4SRC_PATH/build/$1.json"
+
+    if [ ! -f $P4SRC ]
+        then
+          echo "No such file $CURR_P4SRC"
+          return
+    fi
+
+    # FIXME: p4c-bmv2 doesn't seem to work without sudo
+    sudo p4c-bmv2 --json $P4JSON $P4SRC
+}
+
+p4cli () {
+    if [ -z "$1" ]; then
+        echo "No argument supplied. Usage: p4cli THRIFT_PORT"
+        return
+    fi
+    tport=$(head -n 1 /tmp/bmv2-$1-thrift-port)
+    sudo $BMV2_PATH/tools/runtime_CLI.py --thrift-port $tport
+}
+
+p4db () {
+    if [ -z "$1" ]; then
+        echo "No argument supplied. Usage: p4db THRIFT_PORT"
+        return
+    fi
+    tport=$(head -n 1 /tmp/bmv2-$1-thrift-port)
+    sudo $BMV2_PATH/tools/p4dbg.py --thrift-port $tport
+}
+
+p4nmsg () {
+    if [ -z "$1" ]; then
+        echo "No argument supplied. Usage: p4nmsg THRIFT_PORT"
+        return
+    fi
+    tport=$(head -n 1 /tmp/bmv2-$1-thrift-port)
+    sudo $BMV2_PATH/tools/nanomsg_client.py --thrift-port $tport
+}
+
+p4log () {
+    if [ -z "$1" ]; then
+        echo "No argument supplied. Usage: p4log DEVICE_ID"
+        return
+    fi
+    tail -f /tmp/bmv2-$1.log
+}
+
+p4bmv2 () {
+
+	#sudo mn -c
+	#sudo killall behavioral-model
+	#redis-cli FLUSHALL
+    sudo -E mn --topo tree,depth=1,fanout=3 --custom $BMV2_PY --switch onosbmv2 --controller remote,ip=127.0.0.1,port=40123
+}
+
+
+#编译一个的特定的p4文件
+function compile(){
+	cd $onos_p4_dev_ROOT/p4src
+	echo "compile -----******------>"$1".p4"
+	export file=$1
+	p4c-bmv2 --json $file.json $file.p4
+
+	scp $file.json /root/ONOS1.6.0/onos-1.6.0/protocols/bmv2/ctl/src/main/resources/$file.json
+	scp $file.json /root/ONOS1.6.0/onos-1.6.0/apps/fwd/src/main/resources/$file.json	
+	scp $file.json /root/ONOS1.6.0/onos-1.6.0/drivers/bmv2/src/main/resources/$file.json
+} 
+
+#关闭虚拟端口
+# down s1-eth3
+down(){
+	ip link delete $1 type veth
+}
+
+p4demo(){
+	python	/root/ONOS1.6.0/onos-1.6.0/apps/fwd/demo.py
+}
+
+p4onos() {
+	compile default
+	compile default_br1
+	compile default_br2
+	compile default_rm1
+	compile default_rm2
+
+	cd $ONOS_ROOT/protocols/bmv2
+	mvn clean install -DskipTests -Dcheckstyle.skip
+	cd $ONOS_ROOT/providers/bmv2
+	mvn clean install -DskipTests -Dcheckstyle.skip
+	cd $ONOS_ROOT/drivers/bmv2
+	mvn clean install -DskipTests -Dcheckstyle.skip
+
+	cd $ONOS_ROOT/apps/fwd
+	mvn clean install -DskipTests -Dcheckstyle.skip
+	cd $ONOS_ROOT/core/net
+	mvn clean install -DskipTests -Dcheckstyle.skip
+
+
+	cd
+	echo "BMv2 ok!"
+	echo "app activate org.onosproject.drivers.bmv2"
+	echo "cd /root/onos-p4-dev/onos-bmv2/targets/simple_switch"
+	echo "sudo -E mn --custom $BMV2_PY --switch onosbmv2 --controller remote,ip=127.0.0.1,port=40123"
+
+	ok clean
+}
+
+
+#启动一个cli并指定相应的端口
+cli(){
+	echo "输入格式为:  cli port"
+	$onos_p4_dev_ROOT/onos-bmv2/targets/simple_switch/runtime_CLI --thrift-port $1
+
+}
+
+#启动一个交换机
+bmv2(){
+	echo "输入格式:  bmv2 port"
+	if [ $1 -eq 40001 ];then
+		$onos_p4_dev_ROOT/onos-bmv2/targets/simple_switch/simple_switch --device-id 1 -i 1@s1-eth1 -i 2@s1-eth2 -i 3@s1-eth3 --thrift-port 40001 --nanolog ipc:///tmp/bmv2-1-log.ipc --debugger --log-console -Lwarn $onos_p4_dev_ROOT/p4src/build/empty.json -- --controller-ip 127.0.0.1 --controller-port 40123
+	fi
+	
+	if [ $1 -eq 40002 ];then
+		$onos_p4_dev_ROOT/onos-bmv2/targets/simple_switch/simple_switch --device-id 2 -i 1@s2-eth1 -i 2@s2-eth2 --thrift-port 40002 --nanolog ipc:///tmp/bmv2-2-log.ipc --debugger --log-console -Lwarn $onos_p4_dev_ROOT/p4src/build/empty.json -- --controller-ip 127.0.0.1 --controller-port 40123
+
+	fi
+
+	if [ $1 -eq 41001 ];then
+		$onos_p4_dev_ROOT/onos-bmv2/targets/simple_switch/simple_switch --device-id 3 -i 1@RM1-eth1 -i 2@RM1-eth2 -i 3@RM1-eth3 --thrift-port $1 --nanolog ipc:///tmp/bmv2-3-log.ipc --debugger --log-console -Lwarn $onos_p4_dev_ROOT/p4src/build/empty.json -- --controller-ip 127.0.0.1 --controller-port 40123
+	fi
+
+	if [ $1 -eq 41002 ];then
+		$onos_p4_dev_ROOT/onos-bmv2/targets/simple_switch/simple_switch --device-id 4 -i 1@BR1-eth1 -i 2@BR1-eth2 -i 3@BR1-eth3 --thrift-port $1 --nanolog ipc:///tmp/bmv2-4-log.ipc --debugger --log-console -Lwarn $onos_p4_dev_ROOT/p4src/build/empty.json -- --controller-ip 127.0.0.1 --controller-port 40123
+	fi
+	
+	if [ $1 -eq 41003 ];then
+		$onos_p4_dev_ROOT/onos-bmv2/targets/simple_switch/simple_switch --device-id 5 -i 1@BR2-eth1 -i 2@BR2-eth2 -i 3@BR2-eth3 --thrift-port $1 --nanolog ipc:///tmp/bmv2-5-log.ipc --debugger --log-console -Lwarn $onos_p4_dev_ROOT/p4src/build/empty.json -- --controller-ip 127.0.0.1 --controller-port 40123
+	fi
+
+	if [ $1 -eq 41004 ];then
+		$onos_p4_dev_ROOT/onos-bmv2/targets/simple_switch/simple_switch --device-id 6 -i 1@RM2-eth1 -i 2@RM2-eth2 --thrift-port $1 --nanolog ipc:///tmp/bmv2-6-log.ipc --debugger --log-console -Lwarn $onos_p4_dev_ROOT/p4src/build/empty.json -- --controller-ip 127.0.0.1 --controller-port 40123
+	fi
+}
+
+fwd(){
+	cd /root/ONOS1.6.0/onos-1.6.0/apps/fwd
+	mvn clean install
+	onos-app localhost reinstall target/onos-app-fwd-1.6.0.oar 
+
+}
+
